@@ -1,0 +1,16 @@
+<component name="libraryTable">
+  <library name="ipp-java-qbapihelper-1.2.2-jar-with-dependencies">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../JavaV3SDK2.9.0/JavaV3SDK2.9.0/ipp-java-qbapihelper-1.2.2-jar-with-dependencies.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../JavaV3SDK2.9.0/JavaV3SDK2.9.0/ipp-java-qbapihelper-1.2.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../JavaV3SDK2.9.0/JavaV3SDK2.9.0/ipp-v3-java-data-2.9.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../JavaV3SDK2.9.0/JavaV3SDK2.9.0/ipp-v3-java-devkit-2.9.0-jar-with-dependencies.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../JavaV3SDK2.9.0/JavaV3SDK2.9.0/ipp-v3-java-devkit-2.9.0.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/../JavaV3SDK2.9.0/JavaV3SDK2.9.0/ipp-v3-java-data-2.9.0-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../JavaV3SDK2.9.0/JavaV3SDK2.9.0/ipp-v3-java-devkit-2.9.0-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES />
+  </library>
+</component>

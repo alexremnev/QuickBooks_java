@@ -1,0 +1,104 @@
+18:53:28.235 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to create entity
+13:33:07.402 [http-nio-8080-exec-7] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to get entity
+13:33:07.419 [http-nio-8080-exec-7] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to delete the object
+13:33:07.455 [http-nio-8080-exec-7] ERROR com.controller.OauthController - Exception occured when application tried to get access token and secret
+13:37:58.452 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to get entity
+13:37:58.453 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to delete the object
+13:37:58.464 [http-nio-8080-exec-5] ERROR com.controller.OauthController - Exception occured when application tried to get access token and secret
+14:57:12.320 [http-nio-8080-exec-6] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to get entity
+14:57:12.320 [http-nio-8080-exec-6] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to delete the object
+14:57:12.335 [http-nio-8080-exec-6] ERROR com.controller.OauthController - Exception occured when application tried to get access token and secret
+15:04:40.617 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to get entity
+15:04:40.617 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to delete the object
+15:04:40.648 [http-nio-8080-exec-5] ERROR com.controller.OauthController - Exception occured when application tried to get access token and secret
+15:29:30.904 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to get entity
+15:29:30.904 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to delete the object
+15:29:30.928 [http-nio-8080-exec-5] ERROR com.controller.OauthController - Exception occured when application tried to get access token and secret
+15:33:23.113 [http-nio-8080-exec-6] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to get entity
+15:33:23.114 [http-nio-8080-exec-6] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to delete the object
+15:33:23.133 [http-nio-8080-exec-6] ERROR com.controller.OauthController - Exception occured when application tried to get access token and secret
+15:39:44.188 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to get entity
+15:39:44.188 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to delete the object
+15:39:44.201 [http-nio-8080-exec-5] ERROR com.controller.OauthController - Exception occured when application tried to get access token and secret
+15:43:28.002 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to get entity
+15:43:28.003 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to delete the object
+15:43:28.017 [http-nio-8080-exec-5] ERROR com.controller.OauthController - Exception occured when application tried to get access token and secret
+15:45:03.507 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to get entity
+15:45:03.508 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to delete the object
+15:45:03.519 [http-nio-8080-exec-5] ERROR com.controller.OauthController - Exception occured when application tried to get access token and secret
+15:58:41.531 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to get entity
+15:58:41.532 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to delete the object
+15:58:41.568 [http-nio-8080-exec-5] ERROR com.controller.OauthController - Exception occured when application tried to get access token and secret
+16:01:40.821 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to get entity
+16:01:40.821 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to delete the object
+16:01:40.835 [http-nio-8080-exec-5] ERROR com.controller.OauthController - Exception occured when application tried to get access token and secret
+16:08:32.509 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to get entity
+16:08:32.509 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to delete the object
+16:08:32.533 [http-nio-8080-exec-5] ERROR com.controller.OauthController - Exception occured when application tried to get access token and secret
+16:09:08.572 [http-nio-8080-exec-7] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to get entity
+16:09:08.572 [http-nio-8080-exec-7] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to delete the object
+16:09:08.575 [http-nio-8080-exec-7] ERROR com.controller.OauthController - Exception occured when application tried to get access token and secret
+16:12:56.159 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to get entity
+16:12:56.160 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to delete the object
+16:12:56.177 [http-nio-8080-exec-5] ERROR com.controller.OauthController - Exception occured when application tried to get access token and secret
+16:15:05.771 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to get entity
+16:15:05.771 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to delete the object
+16:15:05.786 [http-nio-8080-exec-5] ERROR com.controller.OauthController - Exception occured when application tried to get access token and secret
+16:18:14.080 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to get entity
+16:18:17.737 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to delete the object
+16:18:17.766 [http-nio-8080-exec-5] ERROR com.controller.OauthController - Exception occured when application tried to get access token and secret
+16:20:24.547 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to get entity
+16:20:24.547 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to delete the object
+16:20:24.566 [http-nio-8080-exec-5] ERROR com.controller.OauthController - Exception occured when application tried to get access token and secret
+16:23:10.070 [http-nio-8080-exec-6] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to get entity
+16:23:10.070 [http-nio-8080-exec-6] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to delete the object
+16:23:10.100 [http-nio-8080-exec-6] ERROR com.controller.OauthController - Exception occured when application tried to get access token and secret
+16:53:27.677 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to get entity
+16:53:27.677 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to delete the object
+16:53:27.690 [http-nio-8080-exec-5] ERROR com.controller.OauthController - Exception occured when application tried to get access token and secret
+16:57:07.505 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to get entity
+16:57:07.505 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to delete the object
+16:57:07.512 [http-nio-8080-exec-5] ERROR com.controller.OauthController - Exception occured when application tried to get access token and secret
+16:58:38.734 [http-nio-8080-exec-9] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to get entity
+16:58:38.734 [http-nio-8080-exec-9] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to delete the object
+16:58:38.741 [http-nio-8080-exec-9] ERROR com.controller.OauthController - Exception occured when application tried to get access token and secret
+17:01:16.543 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to get entity
+17:01:16.543 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to delete the object
+17:01:16.552 [http-nio-8080-exec-5] ERROR com.controller.OauthController - Exception occured when application tried to get access token and secret
+17:03:28.911 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to get entity
+17:03:28.911 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to delete the object
+17:03:28.920 [http-nio-8080-exec-5] ERROR com.controller.OauthController - Exception occured when application tried to get access token and secret
+17:05:17.764 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to get entity
+17:05:17.766 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to delete the object
+17:05:17.781 [http-nio-8080-exec-5] ERROR com.controller.OauthController - Exception occured when application tried to get access token and secret
+17:40:46.231 [http-nio-8080-exec-8] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to get entity
+17:40:46.232 [http-nio-8080-exec-8] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to delete the object
+17:40:46.247 [http-nio-8080-exec-8] ERROR com.controller.OauthController - Exception occured when application tried to get access token and secret
+17:50:54.968 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to get entity
+17:50:54.969 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to delete the object
+17:50:54.982 [http-nio-8080-exec-5] ERROR com.controller.OauthController - Exception occured when application tried to get access token and secret
+18:09:22.605 [http-nio-8080-exec-6] ERROR com.intuit.logger - Exception occured when applicaton tried to decrypt entity
+18:09:22.606 [http-nio-8080-exec-6] ERROR com.intuit.logger - Exception occured when applicaton tried to decrypt entity
+18:09:22.706 [http-nio-8080-exec-6] ERROR o.h.i.ExceptionMapperStandardImpl - HHH000346: Error during managed flush [null]
+18:09:22.864 [http-nio-8080-exec-6] ERROR com.controller.OauthController - Exception occured when application tried to get access token and secret
+18:12:48.572 [http-nio-8080-exec-6] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to get entity
+18:12:48.574 [http-nio-8080-exec-6] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to delete the object
+18:12:48.593 [http-nio-8080-exec-6] ERROR com.controller.OauthController - Exception occured when application tried to get access token and secret
+18:18:17.310 [http-nio-8080-exec-5] ERROR com.intuit.logger - Exception occured when applicaton tried to decrypt entity
+18:18:17.311 [http-nio-8080-exec-5] ERROR com.intuit.logger - Exception occured when applicaton tried to decrypt entity
+18:18:17.345 [http-nio-8080-exec-5] ERROR o.h.i.ExceptionMapperStandardImpl - HHH000346: Error during managed flush [null]
+18:18:17.358 [http-nio-8080-exec-5] ERROR com.controller.OauthController - Exception occured when application tried to get access token and secret
+18:23:22.872 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to get entity
+18:23:22.874 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to delete the object
+18:23:22.893 [http-nio-8080-exec-5] ERROR com.controller.OauthController - Exception occured when application tried to get access token and secret
+18:24:58.994 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to get entity
+18:24:58.994 [http-nio-8080-exec-5] ERROR com.dao.OauthDAOImpl - Exception occured when application tried to delete the object
+18:24:59.008 [http-nio-8080-exec-5] ERROR com.controller.OauthController - Exception occured when application tried to get access token and secret
+18:30:59.566 [http-nio-8080-exec-5] ERROR com.intuit.logger - Exception occured when applicaton tried to decrypt entity
+18:31:03.913 [http-nio-8080-exec-5] ERROR com.intuit.logger - Exception occured when applicaton tried to decrypt entity
+18:31:03.981 [http-nio-8080-exec-5] ERROR o.h.i.ExceptionMapperStandardImpl - HHH000346: Error during managed flush [null]
+18:31:04.004 [http-nio-8080-exec-5] ERROR com.controller.OauthController - Exception occured when application tried to get access token and secret
+18:33:39.090 [http-nio-8080-exec-5] ERROR com.intuit.logger - Exception occured when applicaton tried to decrypt entity
+18:33:39.090 [http-nio-8080-exec-5] ERROR com.intuit.logger - Exception occured when applicaton tried to decrypt entity
+18:33:39.158 [http-nio-8080-exec-5] ERROR o.h.i.ExceptionMapperStandardImpl - HHH000346: Error during managed flush [null]
+18:33:39.184 [http-nio-8080-exec-5] ERROR com.controller.OauthController - Exception occured when application tried to get access token and secret

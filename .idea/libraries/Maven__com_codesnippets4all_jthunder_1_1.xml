@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.codesnippets4all:jthunder:1.1">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/codesnippets4all/jthunder/1.1/jthunder-1.1.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/com/codesnippets4all/jthunder/1.1/jthunder-1.1-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/codesnippets4all/jthunder/1.1/jthunder-1.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+    <context:load-time-weaver weaver-class="org.springframework.instrument.classloading.ReflectiveLoadTimeWeaver"
+                              aspectj-weaving="on"/>
+    <context:component-scan base-package="com"/>
+    <context:annotation-config/>
+    <mvc:annotation-driven/>
+
+    <bean id="viewResolver"
+          class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/"/>
+        <!--<value>/WEB-INF/</value>-->
+        <property name="suffix" value=".jsp"/>
+    </bean>
+    <bean id="property" class="com.service.Property">
+        <constructor-arg name="REQUEST_TOKEN_URL" value="https://oauth.intuit.com/oauth/v1/get_request_token"/>
+        <constructor-arg name="ACCESS_TOKEN_URL" value="https://oauth.intuit.com/oauth/v1/get_access_token"/>
+        <constructor-arg name="AUTHORIZE_URL" value="https://appcenter.intuit.com/connect/begin"/>
+        <constructor-arg name="OAUTH_CONSUMER_KEY" value="qyprdDzmuM0rBxHAxboVdt6hEmay8w"/>
+        <constructor-arg name="OAUTH_CONSUMER_SECRET" value="OzAkWoEON3suNDtAwujZEO2M6YjqexTpdBjMELmP"/>
+        <constructor-arg name="OAUTH_CALLBACK_URL" value="http://localhost:8080/accessToken.htm"/>
+        <constructor-arg name="APP_TOKEN" value="926acffab65abb4251b9d29b3d7daf2f4bf5"/>
+        <constructor-arg name="WEB_HOOKS_SUBSCRIBED_ENTITIES" value="Invoice, Estimate, SalesReceipt, CreditMemo"/>
+        <constructor-arg name="VERIFIER" value="3a11cea9-5812-4e51-864d-26df58a076ec"/>
+        <constructor-arg name="ENCRYPTION_KEY" value="0123456789abcdef"/>
+    </bean>
+
+    <bean id="dataSource" class="com.mysql.jdbc.jdbc2.optional.MysqlDataSource">
+        <property name="url" value="jdbc:mysql://localhost:3306/QuickBooks"/>
+        <property name="user" value="root"/>
+        <property name="password" value="alex"/>
+    </bean>
+    <!--<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">-->
+    <!--<property name="driverClassName" value="com.mysql.jdbc.Driver"></property>-->
+    <!--<property name="url" value="jdbc:mysql://localhost:3306/QuickBooks"></property>-->
+    <!--<property name="username" value="root"></property>-->
+    <!--<property name="password" value="alex"></property>-->
+    <!--</bean>-->
+
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="annotatedClasses">
+            <list>
+                <value>com.model.Oauth</value>
+                <value>com.model.Report</value>
+                <value>com.model.LineItem</value>
+                <value>com.model.TaxRate</value>
+            </list>
+        </property>
+        <property name="hibernateProperties">
+            <value>
+                hibernate.dialect=org.hibernate.dialect.MySQLDialect
+                hibernate.show_sql=true
+                <!--hibernate.hbm2ddl.auto=create-->
+            </value>
+        </property>
+    </bean>
+    <tx:annotation-driven/>
+    <bean id="transactionManager"
+          class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+</beans>
