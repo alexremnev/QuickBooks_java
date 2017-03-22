@@ -28,7 +28,7 @@ public class OauthDAOImpl extends GenericDAOImpl<Oauth> implements OauthDAO {
     }
 
     @Override
-    public void remove() {
+    public void delete() {
         try {
             Oauth oauth = get();
             Session session = this.sessionFactory.getCurrentSession();

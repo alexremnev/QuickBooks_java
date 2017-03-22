@@ -23,9 +23,10 @@ public class OauthService {
     }
 
     DataService getDataService() throws FMSException {
-       Context context = getContext();
+        Context context = getContext();
         return new DataService(context);
     }
+
     Context getContext() throws FMSException {
         Oauth oauth = oauthDAO.get();
         OAuthAuthorizer authorizer = new OAuthAuthorizer(property.getOAUTH_CONSUMER_KEY(), property.getOAUTH_CONSUMER_SECRET(), oauth.getAccessToken(), oauth.getAccessTokenSecret());

@@ -30,7 +30,7 @@ import static com.intuit.ipp.query.GenerateQuery.select;
 @SuppressWarnings("unchecked")
 @Service
 public abstract class BaseServiceImpl<T extends SalesTransaction> implements BaseService<T> {
-    private Logger logger;
+    private static Logger logger;
     private Class<T> entityClass;
     OauthService oauthService;
     private ReportDAO reportDAO;
@@ -55,14 +55,24 @@ public abstract class BaseServiceImpl<T extends SalesTransaction> implements Bas
 
     public void calculate() {
         try {
-            List<SalesTransaction> entities = oauthService.getDataService().findAll(entityClass.newInstance());
+            List<SalesTransaction> entities = getAllEnitities();
             calculate(entities);
         } catch (Exception e) {
-            logger.error("Exception occured when application tried to recalculate sales tax in " + entityName, e.getCause());
+            logger.error("Exception occured when application tried to recalculate sales tax", e.getCause());
         }
     }
 
-    public List calculate(List<SalesTransaction> entities) throws FMSException {
+    private List<SalesTransaction> getAllEnitities() throws InstantiationException, IllegalAccessException, FMSException {
+        try {
+            DataService dataService = oauthService.getDataService();
+            return dataService.findAll(entityClass.newInstance());
+        } catch (FMSException e) {
+            logger.error("Exception occured when application tried to get list of entities from QuickBooks", e);
+            throw e;
+        }
+    }
+
+    protected List calculate(List<SalesTransaction> entities) throws FMSException{
         try {
             taxRateMap = getCustomerTaxRate();
             DataService dataService = oauthService.getDataService();
@@ -81,7 +91,7 @@ public abstract class BaseServiceImpl<T extends SalesTransaction> implements Bas
             }
             return entities;
         } catch (Exception e) {
-            logger.error("Exception occured when application tried to recalculate sales tax in " + entityName, e.getCause());
+            logger.error("Exception occured when application tried to recalculate sales tax", e.getCause());
             throw e;
         }
     }
@@ -276,32 +286,36 @@ public abstract class BaseServiceImpl<T extends SalesTransaction> implements Bas
     }
 
     @SuppressWarnings("unchecked")
-    public void process(Entity entity) throws FMSException {
-        if (entity.getOperation().equals("Delete")) {
-            reportDAO.remove(entity.getId());
-            return;
-        }
-        DataService dataService = oauthService.getDataService();
-        Invoice invoice = GenerateQuery.createQueryEntity(Invoice.class);
-        String query = select($(invoice)).where($(invoice.getId()).eq(entity.getId())).generate();
-        query = query.replaceAll("tring.", "");
-        QueryResult result = dataService.executeQuery(query);
-        List<SalesTransaction> entityFromQuickBooks = (List<SalesTransaction>) result.getEntities();
-        if (entityFromQuickBooks.size() == 0) return;
-        if (!entity.getOperation().equals("Create")) {
-            if (!entity.getOperation().equals("Update")) return;
-            Report reportEntity = reportDAO.get(entity.getId());
-            if (reportEntity == null) {
-                calculate(entityFromQuickBooks);
+    public void process(Entity entity) {
+        try {
+            if (entity.getOperation().equals("Delete")) {
+                reportDAO.delete(entity.getId());
                 return;
             }
-            if (isEqualLines(entityFromQuickBooks.get(0).getLine(), reportEntity.getLineItems())) return;
-            List<SalesTransaction> recalculatedList = calculate(entityFromQuickBooks);
-            reportDAO.remove(entity.getId());
-            save(recalculatedList);
-        } else {
-            List<SalesTransaction> recalculatedList = calculate(entityFromQuickBooks);
-            save(recalculatedList);
+            DataService dataService = oauthService.getDataService();
+            Invoice invoice = GenerateQuery.createQueryEntity(Invoice.class);
+            String query = select($(invoice)).where($(invoice.getId()).eq(entity.getId())).generate();
+            query = query.replaceAll("tring.", "");
+            QueryResult result = dataService.executeQuery(query);
+            List<SalesTransaction> entityFromQuickBooks = (List<SalesTransaction>) result.getEntities();
+            if (entityFromQuickBooks.size() == 0) return;
+            if (!entity.getOperation().equals("Create")) {
+                if (!entity.getOperation().equals("Update")) return;
+                Report reportEntity = reportDAO.get(entity.getId());
+                if (reportEntity == null) {
+                    calculate(entityFromQuickBooks);
+                    return;
+                }
+                if (isEqualLines(entityFromQuickBooks.get(0).getLine(), reportEntity.getLineItems())) return;
+                List<SalesTransaction> recalculatedList = calculate(entityFromQuickBooks);
+                reportDAO.delete(entity.getId());
+                save(recalculatedList);
+            } else {
+                List<SalesTransaction> recalculatedList = calculate(entityFromQuickBooks);
+                save(recalculatedList);
+            }
+        } catch (FMSException e) {
+            logger.error("Exception occured when application tried to prosess incoming entities", e);
         }
     }
 

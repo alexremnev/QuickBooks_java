@@ -1,19 +1,13 @@
 package com.service;
 
-import com.intuit.ipp.data.Entity;
 import com.intuit.ipp.data.SalesTransaction;
-import com.intuit.ipp.exception.FMSException;
 
-import java.util.List;
-
+/**
+ * Represents base operations for calculating and processing {@code com.intuit.ipp.data.SalesTransaction}'s.
+ *
+ * @param <T> the type of calculated entity.
+ */
 public interface BaseService<T extends SalesTransaction> extends Persistable<T> {
 
-    List<T> calculate(List<SalesTransaction> entities) throws FMSException;
-
-    void calculate();
-
-    void process(Entity entity) throws FMSException;
-
-    String getEntityName();
 }
 

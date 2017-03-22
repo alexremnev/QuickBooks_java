@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class WebhooksController {
-    private static final Logger logger = LoggerFactory.getLogger(WebhooksController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WebhooksController.class);
     private static final String SIGNATURE = "intuit-signature";
     private SecurityService securityService;
     private QueueService queueService;
@@ -34,16 +34,16 @@ public class WebhooksController {
             if (!StringUtils.hasText(payload)) {
                 new ResponseEntity<>("SUCCESS", HttpStatus.OK);
             }
-            logger.info("request recieved ");
+            LOGGER.info("request recieved ");
             if (securityService.isRequestValid(signature, payload)) {
                 queueService.add(payload);
             } else {
                 return new ResponseEntity<>("ERROR", HttpStatus.FORBIDDEN);
             }
-            logger.info("response sent ");
+            LOGGER.info("response sent ");
             return new ResponseEntity<>("SUCCESS", HttpStatus.OK);
         } catch (Exception e) {
-            logger.error("Exception occured when application tried to handle incoming notifications", e.getCause());
+            LOGGER.error("Exception occured when application tried to handle incoming notifications", e.getCause());
             return new ResponseEntity<>("ERROR", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

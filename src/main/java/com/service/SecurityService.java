@@ -29,7 +29,7 @@ public class SecurityService {
         try {
             secretKey = new SecretKeySpec(getEncryptionKey().getBytes("UTF-8"), "AES");
         } catch (UnsupportedEncodingException e) {
-            logger.error("Error during initializing secretkeyspec ", e.getCause());
+            logger.error("Error during initializing secretkeyspec ", e);
         }
     }
 
@@ -54,7 +54,7 @@ public class SecurityService {
             byte[] byteCipherText = aesCipher.doFinal(plainText.getBytes());
             return bytesToHex(byteCipherText);
         } catch (Exception e) {
-            logger.error("Exception occured when application tried to encrypt entity", e.getCause());
+            logger.error("Exception occured when application tried to encrypt entity", e);
             return null;
         }
     }
@@ -66,7 +66,7 @@ public class SecurityService {
             byte[] bytePlainText = aesCipher.doFinal(hexToBytes(byteCipherText));
             return new String(bytePlainText);
         } catch (Exception e) {
-            logger.error("Exception occured when applicaton tried to decrypt entity", e.getCause());
+            logger.error("Exception occured when applicaton tried to decrypt entity", e);
             return null;
         }
     }

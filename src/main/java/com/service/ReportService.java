@@ -12,7 +12,7 @@
 //import com.model.Report;
 //import com.model.TaxRate;
 //import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.stereotype.ProcessService;
+//import org.springframework.stereotype.Calculative;
 //
 //import java.math.BigDecimal;
 //import java.math.BigInteger;
@@ -21,7 +21,7 @@
 //import static com.intuit.ipp.query.GenerateQuery.$;
 //import static com.intuit.ipp.query.GenerateQuery.select;
 //
-//@ProcessService
+//@Calculative
 //public class ReportService {
 //    private OauthService oauthService;
 //    private ReportDAO reportDAO;
@@ -264,7 +264,7 @@
 //    @SuppressWarnings("unchecked")
 //    void process(Entity entity) throws FMSException {
 //        if (entity.getOperation().equals("Delete")) {
-//            reportDAO.remove(entity.getId());
+//            reportDAO.delete(entity.getId());
 //            return;
 //        }
 //        DataService dataService = oauthService.getDataService();
@@ -283,7 +283,7 @@
 //            }
 //            if (isEqualLines(entityFromQuickBooks.get(0).getLine(), reportEntity.getLineItems())) return;
 //            List<SalesTransaction> recalculatedList = calculate(entityFromQuickBooks);
-//            reportDAO.remove(entity.getId());
+//            reportDAO.delete(entity.getId());
 //            save(recalculatedList);
 //        } else {
 //            List<SalesTransaction> recalculatedList = calculate(entityFromQuickBooks);

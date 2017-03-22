@@ -28,7 +28,7 @@ import java.net.URL;
 @Controller
 public class OauthController {
 
-    private static final Logger logger = LoggerFactory.getLogger(OauthController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OauthController.class);
 
     private Property property;
     private OauthDAO oauthDAO;
@@ -54,7 +54,7 @@ public class OauthController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("Exception occured when application tried to get request token", e.getCause());
+            LOGGER.error("Exception occured when application tried to get request token", e.getCause());
         }
         return "index";
     }
@@ -91,12 +91,12 @@ public class OauthController {
             if (responseElements.length > 1) {
                 accessToken = responseElements[1].split("=")[1];
                 accessTokenSecret = responseElements[0].split("=")[1];
-                oauthDAO.remove();
+                oauthDAO.delete();
                 oauthDAO.save(new Oauth(realmID, accessToken, accessTokenSecret));
             }
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("Exception occured when application tried to get access token and secret", e.getCause());
+            LOGGER.error("Exception occured when application tried to get access token and secret", e.getCause());
         }
         return "close";
     }

@@ -34,7 +34,6 @@ public abstract class GenericDAOImpl<T> implements GenericDAO<T> {
         try {
             Session session = sessionFactory.getCurrentSession();
             return session.load(entityClass, id);
-
         } catch (Exception e) {
             logger.error("Exception occured when application tried to get entity by id", e.getCause());
             throw e;
@@ -65,7 +64,7 @@ public abstract class GenericDAOImpl<T> implements GenericDAO<T> {
     }
 
     @Override
-    public void remove(String id) {
+    public void delete(String id) {
         try {
             Session session = sessionFactory.getCurrentSession();
             T entity = get(id);

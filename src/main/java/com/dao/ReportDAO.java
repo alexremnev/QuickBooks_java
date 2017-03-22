@@ -3,7 +3,8 @@ package com.dao;
 
 import com.model.Report;
 
-import java.util.List;
-
+/**
+ * Represents crud operations for {@code Report} model.
+ */
 public interface ReportDAO extends GenericDAO<Report> {
 }

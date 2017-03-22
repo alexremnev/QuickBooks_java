@@ -5,8 +5,21 @@ import com.intuit.ipp.exception.FMSException;
 
 import java.util.List;
 
-public interface Persistable<T extends SalesTransaction> extends ProcessService {
+/**
+ * Represent save operations for {@code com.intuit.ipp.data.SalesTransaction}'s entities.
+ *
+ * @param <T> the type of persistable entity.
+ */
+public interface Persistable<T extends SalesTransaction> extends Calculative {
+    /**
+     * Saves list of {@code com.intuit.ipp.data.SalesTransaction}'s entities.
+     *
+     * @param entities list of {@code com.intuit.ipp.data.SalesTransaction}'s.
+     */
     void save(List<SalesTransaction> entities) throws FMSException;
-    void save() throws FMSException;
 
+    /**
+     * Saves all {@code com.intuit.ipp.data.SalesTransaction}'s.
+     */
+    void save() throws FMSException;
 }

@@ -15,7 +15,7 @@ import java.io.IOException;
 @Controller
 public class ReportController {
 
-    private static final Logger logger = LoggerFactory.getLogger(ReportController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReportController.class);
     private Persistable[] services;
 
     @Autowired
@@ -30,7 +30,7 @@ public class ReportController {
             calculateDocuments();
             return "index";
         } catch (Exception e) {
-            logger.error("Exception occured when you tried to recalculate sales tax", e.getCause());
+            LOGGER.error("Exception occured when you tried to recalculate sales tax", e.getCause());
             return "exception";
         }
     }
@@ -40,7 +40,7 @@ public class ReportController {
         try {
             saveData();
         } catch (Exception e) {
-            logger.error("Exception occured when you tried to pull entity", e.getCause());
+            LOGGER.error("Exception occured when you tried to pull entity", e.getCause());
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
         return "index";

@@ -17,12 +17,12 @@ public class QueueProcessor implements Runnable {
     @Autowired
     private QueueService queueService;
 
-    private Map<String, ProcessService> serviceDictionary;
+    private Map<String, Calculative> serviceDictionary;
 
     @Autowired
-    public QueueProcessor(ProcessService... services) {
+    public QueueProcessor(Calculative... services) {
         serviceDictionary = new HashMap<>();
-        for (ProcessService service : services) {
+        for (Calculative service : services) {
             serviceDictionary.put(service.getEntityName(), service);
         }
     }
