@@ -22,13 +22,13 @@ public class QueueService {
 
     @PostConstruct
     public void init() {
-         executorService = Executors.newSingleThreadExecutor();
+        executorService = Executors.newSingleThreadExecutor();
     }
 
     public void add(String payload) throws Exception {
         QUEUE.add(payload);
         executorService.submit(queueProcessor);
-     }
+    }
 
     BlockingQueue<String> getQueue() {
         return QUEUE;

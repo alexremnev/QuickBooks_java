@@ -30,7 +30,7 @@ public class ReportController {
             calculateDocuments();
             return "index";
         } catch (Exception e) {
-            LOGGER.error("Exception occured when you tried to recalculate sales tax", e.getCause());
+            LOGGER.error("Exception occured when application recalculated sales tax", e);
             return "exception";
         }
     }
@@ -40,7 +40,7 @@ public class ReportController {
         try {
             saveData();
         } catch (Exception e) {
-            LOGGER.error("Exception occured when you tried to pull entity", e.getCause());
+            LOGGER.error("Exception occured when application persisted entity", e);
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
         return "index";

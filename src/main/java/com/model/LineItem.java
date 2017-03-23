@@ -23,24 +23,8 @@ public class LineItem {
     public LineItem() {
     }
 
-    public int getId() {
-        return Id;
-    }
-
-    public void setId(int id) {
-        Id = id;
-    }
-
-    public String getName() {
-        return Name;
-    }
-
     public void setName(String name) {
         Name = name;
-    }
-
-    public BigDecimal getQuantity() {
-        return Quantity;
     }
 
     public void setQuantity(BigDecimal quantity) {

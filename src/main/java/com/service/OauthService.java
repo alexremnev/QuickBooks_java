@@ -7,18 +7,17 @@ import com.intuit.ipp.security.OAuthAuthorizer;
 import com.intuit.ipp.services.DataService;
 import com.dao.OauthDAO;
 import com.model.Oauth;
+import com.util.Property;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class OauthService {
 
-    private Property property;
     private OauthDAO oauthDAO;
 
     @Autowired
-    public OauthService(Property property, OauthDAO oauthDAO) {
-        this.property = property;
+    public OauthService(OauthDAO oauthDAO) {
         this.oauthDAO = oauthDAO;
     }
 
@@ -29,7 +28,7 @@ public class OauthService {
 
     Context getContext() throws FMSException {
         Oauth oauth = oauthDAO.get();
-        OAuthAuthorizer authorizer = new OAuthAuthorizer(property.getOAUTH_CONSUMER_KEY(), property.getOAUTH_CONSUMER_SECRET(), oauth.getAccessToken(), oauth.getAccessTokenSecret());
-        return new Context(authorizer, property.getAPP_TOKEN(), ServiceType.QBO, oauth.getRealmId());
+        OAuthAuthorizer authorizer = new OAuthAuthorizer(Property.OAUTH_CONSUMER_KEY, Property.OAUTH_CONSUMER_SECRET, oauth.getAccessToken(), oauth.getAccessTokenSecret());
+        return new Context(authorizer, Property.APP_TOKEN, ServiceType.QBO, oauth.getRealmId());
     }
 }

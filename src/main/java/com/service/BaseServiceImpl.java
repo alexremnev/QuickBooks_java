@@ -58,94 +58,141 @@ public abstract class BaseServiceImpl<T extends SalesTransaction> implements Bas
             List<SalesTransaction> entities = getAllEnitities();
             calculate(entities);
         } catch (Exception e) {
-            logger.error("Exception occured when application tried to recalculate sales tax", e.getCause());
+            logger.error("Exception occured when application recalculated sales tax", e);
         }
     }
 
-    private List<SalesTransaction> getAllEnitities() throws InstantiationException, IllegalAccessException, FMSException {
+    protected List calculate(List<SalesTransaction> entities) throws FMSException {
         try {
-            DataService dataService = oauthService.getDataService();
-            return dataService.findAll(entityClass.newInstance());
-        } catch (FMSException e) {
-            logger.error("Exception occured when application tried to get list of entities from QuickBooks", e);
-            throw e;
-        }
-    }
-
-    protected List calculate(List<SalesTransaction> entities) throws FMSException{
-        try {
-            taxRateMap = getCustomerTaxRate();
-            DataService dataService = oauthService.getDataService();
             if (entities.size() == 0) return new ArrayList<>();
+            taxRateMap = getCustomerTaxRate();
             for (SalesTransaction entity : entities) {
-                setTaxCode(entity);
                 if ((entity.getShipAddr() == null) || (entity.getShipAddr().getCountrySubDivisionCode() == null))
                     continue;
-                String countrySubDivisionCode = entity.getShipAddr().getCountrySubDivisionCode();
-                BigDecimal percent = getPercent(countrySubDivisionCode);
-                setTaxCodeRef(percent, entity);
-                if (entity.getTxnTaxDetail().getTotalTax().compareTo(new BigDecimal(0)) == 0) {
-                    recalculateTaxManually(entity, percent);
-                }
-                dataService.update(entity);
+                recalculateDocument(entity);
+                updateDocument(entity);
             }
             return entities;
         } catch (Exception e) {
-            logger.error("Exception occured when application tried to recalculate sales tax", e.getCause());
+            logger.error("Exception occured when application recalculated all sales tax", e);
             throw e;
         }
     }
 
     public void save() throws FMSException {
         try {
-            List<SalesTransaction> entities = oauthService.getDataService().findAll(entityClass.newInstance());
+            List<SalesTransaction> entities = getAllEnitities();
             save(entities);
 
         } catch (Exception e) {
-            logger.error("Exception occured when application tried to save " + entityName, e.getCause());
+            logger.error("Exception occured when application saved entity", e);
         }
     }
 
     public void save(List<SalesTransaction> entities) throws FMSException {
         for (SalesTransaction entity : entities) {
-            Report report = new Report();
-            List<LineItem> lineItemList = new ArrayList<>();
-            report.setId(entity.getId());
-            report.setSaleDate(entity.getTxnDate());
-            report.setDocumentNumber(entity.getDocNumber());
-            if (entity.getBillAddr().getLine1() != null) report.setCustomerName(entity.getCustomerRef().getName());
-            StringBuilder address = new StringBuilder();
-            if (entity.getShipAddr() != null) {
-                if (entity.getShipAddr().getLine1() != null)
-                    address.append(entity.getShipAddr().getLine1()).append(" ");
-                if ((entity.getShipAddr().getCity()) != null)
-                    address.append(entity.getShipAddr().getCity()).append(" ");
-                if (entity.getShipAddr().getCountrySubDivisionCode() != null)
-                    address.append(entity.getShipAddr().getCountrySubDivisionCode()).append(" ");
-                if (entity.getShipAddr().getPostalCode() != null)
-                    address.append(entity.getShipAddr().getPostalCode());
-            }
-            report.setShipToAddress(address.toString());
-            if (entity.getLine() == null) {
-                reportDAO.save(report);
-                continue;
-            }
-            for (Line line : entity.getLine()) {
-                LineItem lineItem = new LineItem();
-                if (line == null) continue;
-                lineItem.setAmount(line.getAmount());
-                if (line.getSalesItemLineDetail() != null) {
-                    lineItem.setQuantity(line.getSalesItemLineDetail().getQty());
-                    if ((line.getSalesItemLineDetail().getItemRef() != null) && (line.getSalesItemLineDetail().getItemRef().getName() != null))
-                        lineItem.setName(line.getSalesItemLineDetail().getItemRef().getName());
-                }
-                lineItemList.add(lineItem);
-            }
-            report.setLineItems(lineItemList);
+            Report report = composeReport(entity);
+            if (report == null) continue;
             reportDAO.save(report);
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public void process(Entity entity) {
+        try {
+            if (entity.getOperation().equals("Delete")) {
+                reportDAO.delete(entity.getId());
+                return;
+            }
+            List<SalesTransaction> entityFromQuickBooks = getEntityFromQuickBooks(entity);
+            if (entityFromQuickBooks.size() == 0) return;
+            if (!entity.getOperation().equals("Create")) {
+                if (!entity.getOperation().equals("Update")) return;
+                Report reportEntity = reportDAO.get(entity.getId());
+                if (reportEntity == null) {
+                    calculate(entityFromQuickBooks);
+                    return;
+                }
+                if (isEqualLines(entityFromQuickBooks.get(0).getLine(), reportEntity.getLineItems())) return;
+                List<SalesTransaction> recalculatedList = calculate(entityFromQuickBooks);
+                reportDAO.delete(entity.getId());
+                save(recalculatedList);
+            } else {
+                List<SalesTransaction> recalculatedList = calculate(entityFromQuickBooks);
+                save(recalculatedList);
+            }
+        } catch (FMSException | InstantiationException | IllegalAccessException e) {
+            logger.error("Exception occured when application tried to prosess incoming entities", e);
+        }
+    }
+
+    private List<SalesTransaction> getAllEnitities() throws InstantiationException, IllegalAccessException, FMSException {
+        try {
+            DataService dataService = getDataService();
+            return dataService.findAll(entityClass.newInstance());
+        } catch (FMSException e) {
+            logger.error("Exception occured when application got list of entities from QuickBooks", e);
+            throw e;
+        }
+    }
+
+    private void recalculateDocument(SalesTransaction entity) throws FMSException {
+        setTaxCode(entity);
+        String countrySubDivisionCode = entity.getShipAddr().getCountrySubDivisionCode();
+        BigDecimal percent = getPercent(countrySubDivisionCode);
+        setTaxCodeRef(percent, entity);
+        if (entity.getTxnTaxDetail().getTotalTax().compareTo(new BigDecimal(0)) == 0) {
+            recalculateTaxManually(entity, percent);
+        }
+    }
+
+    private Report composeReport(SalesTransaction entity) {
+        Report report = new Report();
+        report.setId(entity.getId());
+        report.setSaleDate(entity.getTxnDate());
+        report.setDocumentNumber(entity.getDocNumber());
+        if (entity.getBillAddr().getLine1() != null) report.setCustomerName(entity.getCustomerRef().getName());
+        StringBuilder address = getAddress(entity);
+        report.setShipToAddress(address.toString());
+        if (entity.getLine() == null) {
+            reportDAO.save(report);
+            return null;
+        }
+        List<LineItem> lineItemList = getLineItems(entity);
+        report.setLineItems(lineItemList);
+        return report;
+    }
+
+    private List<LineItem> getLineItems(SalesTransaction entity) {
+        List<LineItem> lineItemList = new ArrayList<>();
+        for (Line line : entity.getLine()) {
+            LineItem lineItem = new LineItem();
+            if (line == null) continue;
+            lineItem.setAmount(line.getAmount());
+            if (line.getSalesItemLineDetail() != null) {
+                lineItem.setQuantity(line.getSalesItemLineDetail().getQty());
+                if ((line.getSalesItemLineDetail().getItemRef() != null) && (line.getSalesItemLineDetail().getItemRef().getName() != null))
+                    lineItem.setName(line.getSalesItemLineDetail().getItemRef().getName());
+            }
+            lineItemList.add(lineItem);
+        }
+        return lineItemList;
+    }
+
+    private StringBuilder getAddress(SalesTransaction entity) {
+        StringBuilder address = new StringBuilder();
+        if (entity.getShipAddr() != null) {
+            if (entity.getShipAddr().getLine1() != null)
+                address.append(entity.getShipAddr().getLine1()).append(" ");
+            if ((entity.getShipAddr().getCity()) != null)
+                address.append(entity.getShipAddr().getCity()).append(" ");
+            if (entity.getShipAddr().getCountrySubDivisionCode() != null)
+                address.append(entity.getShipAddr().getCountrySubDivisionCode()).append(" ");
+            if (entity.getShipAddr().getPostalCode() != null)
+                address.append(entity.getShipAddr().getPostalCode());
+        }
+        return address;
+    }
 
     private Map<String, BigDecimal> getCustomerTaxRate() {
         List<com.model.TaxRate> taxRates = taxRateDAO.list();
@@ -213,14 +260,15 @@ public abstract class BaseServiceImpl<T extends SalesTransaction> implements Bas
     private String getTxnCodeRefValue(BigDecimal taxRate) throws FMSException {
         String taxCodeId = getTaxRateId(taxRate);
         if (taxCodeId != null) {
-            DataService service = oauthService.getDataService();
+            DataService service = getDataService();
             String query = "SELECT * FROM TaxCode";
             QueryResult queryResult = service.executeQuery(query);
             List<TaxCode> stateTaxCodes = (List<TaxCode>) queryResult.getEntities();
             TaxCode taxCode = null;
             for (TaxCode code : stateTaxCodes) {
                 if ((code != null) && (code.getSalesTaxRateList() != null) && (code.getSalesTaxRateList().getTaxRateDetail() != null) &&
-                        (code.getSalesTaxRateList().getTaxRateDetail().get(0) != null) && (code.getSalesTaxRateList().getTaxRateDetail().get(0).getTaxRateRef() != null) &&
+                        (code.getSalesTaxRateList().getTaxRateDetail().get(0) != null) &&
+                        (code.getSalesTaxRateList().getTaxRateDetail().get(0).getTaxRateRef() != null) &&
                         (code.getSalesTaxRateList().getTaxRateDetail().get(0).getTaxRateRef().getValue() != null) &&
                         ((code.getSalesTaxRateList().getTaxRateDetail().get(0).getTaxRateRef().getValue().compareTo(taxCodeId) == 0))) {
                     taxCode = code;
@@ -236,14 +284,8 @@ public abstract class BaseServiceImpl<T extends SalesTransaction> implements Bas
     }
 
     private TaxService addTaxService(BigDecimal percent) throws FMSException {
-        TaxAgency taxAgency = new TaxAgency();
-        DataService service = oauthService.getDataService();
-        TaxAgency taxagency = GenerateQuery.createQueryEntity(TaxAgency.class);
-        String query = select($(taxagency)).generate();
-        query = query.replaceAll("tring.", "");
-        //String query = "Select * From TaxAgency";
-        QueryResult queryResult = service.executeQuery(query);
-        if (queryResult != null) taxAgency = (TaxAgency) queryResult.getEntities().get(0);
+        DataService service = getDataService();
+        TaxAgency taxAgency = getTaxAgency(service);
         if (taxAgency == null) {
             TaxAgency agency = new TaxAgency();
             agency.setDisplayName("New Tax Agency");
@@ -265,8 +307,18 @@ public abstract class BaseServiceImpl<T extends SalesTransaction> implements Bas
         return taxService;
     }
 
+    private TaxAgency getTaxAgency(DataService service) throws FMSException {
+        TaxAgency taxAgency = new TaxAgency();
+        TaxAgency taxagency = GenerateQuery.createQueryEntity(TaxAgency.class);
+        String query = select($(taxagency)).generate();
+        query = query.replaceAll("tring.", "");
+        QueryResult queryResult = service.executeQuery(query);
+        if (queryResult != null) taxAgency = (TaxAgency) queryResult.getEntities().get(0);
+        return taxAgency;
+    }
+
     private String getTaxRateId(BigDecimal taxRate) throws FMSException {
-        List<com.intuit.ipp.data.TaxRate> taxRates = oauthService.getDataService().findAll(new com.intuit.ipp.data.TaxRate());
+        List<com.intuit.ipp.data.TaxRate> taxRates = getDataService().findAll(new com.intuit.ipp.data.TaxRate());
         for (com.intuit.ipp.data.TaxRate rateValue : taxRates) {
             if ((rateValue.getRateValue().compareTo(taxRate) == 0) && (rateValue.isActive())) {
                 return rateValue.getId();
@@ -285,38 +337,13 @@ public abstract class BaseServiceImpl<T extends SalesTransaction> implements Bas
         entity.getTxnTaxDetail().setTotalTax(totalTax);
     }
 
-    @SuppressWarnings("unchecked")
-    public void process(Entity entity) {
-        try {
-            if (entity.getOperation().equals("Delete")) {
-                reportDAO.delete(entity.getId());
-                return;
-            }
-            DataService dataService = oauthService.getDataService();
-            Invoice invoice = GenerateQuery.createQueryEntity(Invoice.class);
-            String query = select($(invoice)).where($(invoice.getId()).eq(entity.getId())).generate();
-            query = query.replaceAll("tring.", "");
-            QueryResult result = dataService.executeQuery(query);
-            List<SalesTransaction> entityFromQuickBooks = (List<SalesTransaction>) result.getEntities();
-            if (entityFromQuickBooks.size() == 0) return;
-            if (!entity.getOperation().equals("Create")) {
-                if (!entity.getOperation().equals("Update")) return;
-                Report reportEntity = reportDAO.get(entity.getId());
-                if (reportEntity == null) {
-                    calculate(entityFromQuickBooks);
-                    return;
-                }
-                if (isEqualLines(entityFromQuickBooks.get(0).getLine(), reportEntity.getLineItems())) return;
-                List<SalesTransaction> recalculatedList = calculate(entityFromQuickBooks);
-                reportDAO.delete(entity.getId());
-                save(recalculatedList);
-            } else {
-                List<SalesTransaction> recalculatedList = calculate(entityFromQuickBooks);
-                save(recalculatedList);
-            }
-        } catch (FMSException e) {
-            logger.error("Exception occured when application tried to prosess incoming entities", e);
-        }
+    private List<SalesTransaction> getEntityFromQuickBooks(Entity entity) throws FMSException, InstantiationException, IllegalAccessException {
+        DataService dataService = getDataService();
+        T queryEntity = GenerateQuery.createQueryEntity(entityClass.newInstance());
+        String query = select($(queryEntity)).where($(queryEntity.getId()).eq(entity.getId())).generate();
+        query = query.replaceAll("tring.", "");
+        QueryResult result = dataService.executeQuery(query);
+        return (List<SalesTransaction>) result.getEntities();
     }
 
     private static Boolean isEqualLines(List<Line> quickBookslines, List<LineItem> actualLines) {
@@ -326,5 +353,14 @@ public abstract class BaseServiceImpl<T extends SalesTransaction> implements Bas
             if (quickBookslines.get(i).getAmount().compareTo(actualLines.get(i).getAmount()) == 0) return false;
         }
         return true;
+    }
+
+    private void updateDocument(SalesTransaction entity) throws FMSException {
+        DataService dataService = getDataService();
+        dataService.update(entity);
+    }
+
+    private DataService getDataService() throws FMSException {
+        return oauthService.getDataService();
     }
 }

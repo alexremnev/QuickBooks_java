@@ -3,7 +3,7 @@ package com.service;
 import com.intuit.ipp.services.WebhooksService;
 import com.intuit.ipp.util.Config;
 import com.intuit.ipp.util.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.util.Property;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -16,38 +16,25 @@ import java.io.UnsupportedEncodingException;
 public class SecurityService {
     private static final org.slf4j.Logger logger = Logger.getLogger();
 
-    private Property property;
     private SecretKeySpec secretKey;
 
-    @Autowired
-    public SecurityService(Property property) {
-        this.property = property;
-    }
 
     @PostConstruct
     public void init() {
         try {
-            secretKey = new SecretKeySpec(getEncryptionKey().getBytes("UTF-8"), "AES");
+            secretKey = new SecretKeySpec(Property.ENCRYPTION_KEY.getBytes("UTF-8"), "AES");
         } catch (UnsupportedEncodingException e) {
             logger.error("Error during initializing secretkeyspec ", e);
         }
     }
 
     public boolean isRequestValid(String signature, String payload) {
-        Config.setProperty(Config.WEBHOOKS_VERIFIER_TOKEN, getVerifierKey());
+        Config.setProperty(Config.WEBHOOKS_VERIFIER_TOKEN, Property.VERIFIER);
         WebhooksService service = new WebhooksService();
         return service.verifyPayload(signature, payload);
     }
 
-    private String getVerifierKey() {
-        return property.getVERIFIER();
-    }
-
-    private String getEncryptionKey() {
-        return property.getENCRYPTION_KEY();
-    }
-
-    public String encrypt(String plainText) {
+       public String encrypt(String plainText) {
         try {
             Cipher aesCipher = Cipher.getInstance("AES");
             aesCipher.init(Cipher.ENCRYPT_MODE, secretKey);

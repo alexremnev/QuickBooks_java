@@ -43,7 +43,7 @@ public class WebhooksController {
             LOGGER.info("response sent ");
             return new ResponseEntity<>("SUCCESS", HttpStatus.OK);
         } catch (Exception e) {
-            LOGGER.error("Exception occured when application tried to handle incoming notifications", e.getCause());
+            LOGGER.error("Exception occured when application handled incoming notifications", e);
             return new ResponseEntity<>("ERROR", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

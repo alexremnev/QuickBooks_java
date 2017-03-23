@@ -2,12 +2,14 @@ package com.controller;
 
 import com.dao.OauthDAO;
 import com.model.Oauth;
-import com.service.Property;
-import oauth.signpost.OAuth;
-import oauth.signpost.OAuthConsumer;
-import oauth.signpost.OAuthProvider;
+import com.util.Property;
+import oauth.signpost.*;
 import oauth.signpost.basic.DefaultOAuthConsumer;
 import oauth.signpost.basic.DefaultOAuthProvider;
+import oauth.signpost.exception.OAuthCommunicationException;
+import oauth.signpost.exception.OAuthExpectationFailedException;
+import oauth.signpost.exception.OAuthMessageSignerException;
+import oauth.signpost.exception.OAuthNotAuthorizedException;
 import oauth.signpost.http.HttpParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,8 +22,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 
@@ -30,74 +34,107 @@ public class OauthController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OauthController.class);
 
-    private Property property;
     private OauthDAO oauthDAO;
 
     @Autowired
-    public OauthController(Property property, OauthDAO oauthDAO) {
-        this.property = property;
+    public OauthController(OauthDAO oauthDAO) {
         this.oauthDAO = oauthDAO;
     }
 
     @RequestMapping(value = "/start_oauth.htm", method = RequestMethod.GET)
     public String start_oauth(final HttpServletRequest request, HttpServletResponse response) {
-        OAuthConsumer oAuthConsumer;
-        OAuthProvider provider = new DefaultOAuthProvider(property.getREQUEST_TOKEN_URL(), property.getACCESS_TOKEN_URL(), property.getAUTHORIZE_URL());
         try {
-            oAuthConsumer = new DefaultOAuthConsumer(property.getOAUTH_CONSUMER_KEY(), property.getOAUTH_CONSUMER_SECRET());
-            String authUrl = provider.retrieveRequestToken(oAuthConsumer, property.getOAUTH_CALLBACK_URL());
+            OAuthProvider provider = getOAuthProvider();
+            OAuthConsumer oAuthConsumer = getOAuthConsumer();
+            String authUrl = getOauthUrl(provider, oAuthConsumer);
             HttpSession session = request.getSession();
-            session.setAttribute("requestToken", oAuthConsumer.getToken());
-            session.setAttribute("requestTokenSecret", oAuthConsumer.getTokenSecret());
-            session.setAttribute("oauthConsumer", oAuthConsumer);
+            setAttributes(oAuthConsumer, session);
             response.sendRedirect(authUrl);
-
         } catch (Exception e) {
             e.printStackTrace();
-            LOGGER.error("Exception occured when application tried to get request token", e.getCause());
+            LOGGER.error("Exception occured when application tried to get request token", e);
         }
         return "index";
     }
 
     @RequestMapping(value = "/accessToken.htm")
-    public String accessToken(HttpServletRequest request) {
+    public String getTokens(HttpServletRequest request) {
         try {
             HttpSession session = request.getSession();
             String realmID = request.getParameter("realmId");
             session.setAttribute("realmId", realmID);
-            OAuthConsumer oauthconsumer = (OAuthConsumer) session.getAttribute("oauthConsumer");
-            HttpParameters additionalParams = new HttpParameters();
-            additionalParams.put("oauth_callback", OAuth.OUT_OF_BAND);
-            additionalParams.put("oauth_verifier", request.getParameter("oauth_verifier"));
-            oauthconsumer.setAdditionalParameters(additionalParams);
-            String signedURL = oauthconsumer.sign(property.getACCESS_TOKEN_URL());
-            URL url = new URL(signedURL);
-            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+            OAuthConsumer authConsumer = (OAuthConsumer) session.getAttribute("oauthConsumer");
+            setAdditionalParametrs(request, authConsumer);
+            URL url = getUrl(authConsumer);
+            HttpURLConnection urlConnection = getHttpURLConnection(url);
             urlConnection.setRequestMethod("GET");
-            String acceessTokenResponse;
-            String accessToken;
-            String accessTokenSecret;
-
-            BufferedReader rd = new BufferedReader(new InputStreamReader(
-                    urlConnection.getInputStream()));
-            StringBuilder sb = new StringBuilder();
-            String line;
-            while ((line = rd.readLine()) != null) {
-                sb.append(line);
-            }
-            rd.close();
-            acceessTokenResponse = sb.toString();
-            String[] responseElements = acceessTokenResponse.split("&");
-            if (responseElements.length > 1) {
-                accessToken = responseElements[1].split("=")[1];
-                accessTokenSecret = responseElements[0].split("=")[1];
-                oauthDAO.delete();
-                oauthDAO.save(new Oauth(realmID, accessToken, accessTokenSecret));
-            }
+            getAccessTokenAndSecret(realmID, urlConnection);
         } catch (Exception e) {
             e.printStackTrace();
-            LOGGER.error("Exception occured when application tried to get access token and secret", e.getCause());
+            LOGGER.error("Exception occured when application got access token and secret", e);
         }
         return "close";
     }
+
+    private String getOauthUrl(OAuthProvider provider, OAuthConsumer oAuthConsumer) throws OAuthMessageSignerException, OAuthNotAuthorizedException, OAuthExpectationFailedException, OAuthCommunicationException {
+        return provider.retrieveRequestToken(oAuthConsumer, Property.OAUTH_CALLBACK_URL);
+    }
+
+    private URL getUrl(OAuthConsumer oauthconsumer) throws OAuthMessageSignerException, OAuthExpectationFailedException, OAuthCommunicationException, MalformedURLException {
+        String signedURL = oauthconsumer.sign(Property.ACCESS_TOKEN_URL);
+        return new URL(signedURL);
+    }
+
+    private void setAttributes(OAuthConsumer oAuthConsumer, HttpSession session) {
+        session.setAttribute("requestToken", oAuthConsumer.getToken());
+        session.setAttribute("requestTokenSecret", oAuthConsumer.getTokenSecret());
+        session.setAttribute("oauthConsumer", oAuthConsumer);
+    }
+
+    private void getAccessTokenAndSecret(String realmID, HttpURLConnection urlConnection) throws IOException {
+        StringBuilder sb = readInputStream(urlConnection);
+        String acceessTokenResponse = sb.toString();
+        String[] responseElements = acceessTokenResponse.split("&");
+        if (responseElements.length > 1) {
+            String accessToken = responseElements[1].split("=")[1];
+            String accessTokenSecret = responseElements[0].split("=")[1];
+            updateAccessTokenAndSecret(realmID, accessToken, accessTokenSecret);
+        }
+    }
+
+    private StringBuilder readInputStream(HttpURLConnection urlConnection) throws IOException {
+        BufferedReader rd = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = rd.readLine()) != null) {
+            sb.append(line);
+        }
+        rd.close();
+        return sb;
+    }
+
+    private void updateAccessTokenAndSecret(String realmID, String accessToken, String accessTokenSecret) {
+        oauthDAO.delete();
+        oauthDAO.save(new Oauth(realmID, accessToken, accessTokenSecret));
+    }
+
+    private HttpURLConnection getHttpURLConnection(URL url) throws IOException {
+        return (HttpURLConnection) url.openConnection();
+    }
+
+    private AbstractOAuthConsumer getOAuthConsumer() {
+        return new DefaultOAuthConsumer(Property.OAUTH_CONSUMER_KEY, Property.OAUTH_CONSUMER_SECRET);
+    }
+
+    private AbstractOAuthProvider getOAuthProvider() {
+        return new DefaultOAuthProvider(Property.REQUEST_TOKEN_URL, Property.ACCESS_TOKEN_URL, Property.AUTHORIZE_URL);
+    }
+
+    private void setAdditionalParametrs(HttpServletRequest request, OAuthConsumer oauthconsumer) {
+        HttpParameters additionalParams = new HttpParameters();
+        additionalParams.put("oauth_callback", OAuth.OUT_OF_BAND);
+        additionalParams.put("oauth_verifier", request.getParameter("oauth_verifier"));
+        oauthconsumer.setAdditionalParameters(additionalParams);
+    }
+
 }

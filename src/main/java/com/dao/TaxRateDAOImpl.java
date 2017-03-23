@@ -25,7 +25,7 @@ public class TaxRateDAOImpl extends GenericDAOImpl<TaxRate> implements TaxRateDA
             Session session = this.sessionFactory.getCurrentSession();
             return (List<TaxRate>) session.createQuery("from TaxRate ").getResultList();
         } catch (Exception e) {
-            logger.error("Exception occured when application tried to get list of tax rates", e.getCause());
+            logger.error("Exception occured when application got list of tax rates", e);
             throw e;
         }
     }
@@ -36,7 +36,7 @@ public class TaxRateDAOImpl extends GenericDAOImpl<TaxRate> implements TaxRateDA
             Query query = session.createQuery("FROM TaxRate WHERE CountrySubDivisionCode = " + state);
             return (TaxRate) query.getSingleResult();
         } catch (Exception e) {
-            logger.error("Exception occured when application tried to get the tax rate by country subdivision code", e.getCause());
+            logger.error("Exception occured when application got the tax rate by country subdivision code", e);
             throw e;
         }
     }

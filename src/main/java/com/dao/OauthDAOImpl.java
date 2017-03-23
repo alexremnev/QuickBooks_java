@@ -22,7 +22,7 @@ public class OauthDAOImpl extends GenericDAOImpl<Oauth> implements OauthDAO {
             if (oauthList.size() != 0) return oauthList.get(0);
             return new Oauth();
         } catch (Exception e) {
-            logger.error("Exception occured when application tried to get entity", e.getCause());
+            logger.error("Exception occured when application got entity", e);
             throw e;
         }
     }
@@ -35,7 +35,7 @@ public class OauthDAOImpl extends GenericDAOImpl<Oauth> implements OauthDAO {
             if (oauth == null) return;
             session.delete(oauth);
         } catch (Exception e) {
-            logger.error("Exception occured when application tried to delete the object", e.getCause());
+            logger.error("Exception occured when application deleted the object", e);
             throw e;
         }
     }

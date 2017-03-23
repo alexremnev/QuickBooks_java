@@ -35,7 +35,7 @@ public abstract class GenericDAOImpl<T> implements GenericDAO<T> {
             Session session = sessionFactory.getCurrentSession();
             return session.load(entityClass, id);
         } catch (Exception e) {
-            logger.error("Exception occured when application tried to get entity by id", e.getCause());
+            logger.error("Exception occured when application got entity by id", e);
             throw e;
         }
     }
@@ -46,7 +46,7 @@ public abstract class GenericDAOImpl<T> implements GenericDAO<T> {
             Session session = this.sessionFactory.getCurrentSession();
             session.save(t);
         } catch (Exception e) {
-            logger.error("Exception occured when application tried to create entity", e.getCause());
+            logger.error("Exception occured when application created entity", e);
         }
     }
 
@@ -58,7 +58,7 @@ public abstract class GenericDAOImpl<T> implements GenericDAO<T> {
             session.update(t);
 
         } catch (Exception e) {
-            logger.error("Exception occured when application tried to update entity", e.getCause());
+            logger.error("Exception occured when application updated entity", e);
             throw e;
         }
     }
@@ -71,7 +71,7 @@ public abstract class GenericDAOImpl<T> implements GenericDAO<T> {
             if (entity == null) return;
             session.delete(entity);
         } catch (Exception e) {
-            logger.error("Exception occured when application tried to delete the object by id", e.getCause());
+            logger.error("Exception occured when application tried deleted the object by id", e);
             throw e;
         }
     }
