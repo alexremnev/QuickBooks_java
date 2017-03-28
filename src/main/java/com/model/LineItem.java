@@ -19,6 +19,7 @@ public class LineItem {
     private String Name;
     private BigDecimal Quantity;
     private BigDecimal Amount;
+    private int Hash;
 
     public LineItem() {
     }
@@ -31,12 +32,27 @@ public class LineItem {
         Quantity = quantity;
     }
 
-    public BigDecimal getAmount() {
-        return Amount;
-    }
-
     public void setAmount(BigDecimal amount) {
         Amount = amount;
+    }
+
+    public void setHash(int hash) {
+        Hash = hash;
+    }
+
+    public int getHash() {
+        return Hash;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((Name == null) ? 0 : Name.hashCode());
+        result = prime * result + Id;
+        result = (prime * result) + ((Quantity == null) ? 0 : Quantity.hashCode());
+        result = (prime * result) + ((Amount == null) ? 0 : Amount.hashCode());
+        return result;
     }
 }
 

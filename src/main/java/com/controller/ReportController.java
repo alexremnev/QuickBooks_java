@@ -1,6 +1,7 @@
 package com.controller;
 
 import com.intuit.ipp.exception.FMSException;
+import com.service.InvoiceServiceImpl;
 import com.service.Persistable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,13 +49,15 @@ public class ReportController {
 
     private void calculateDocuments() {
         for (Persistable service : services) {
+//            if (InvoiceServiceImpl.class.isAssignableFrom(service.getClass())) service.calculate();
             service.calculate();
         }
     }
 
     private void saveData() throws FMSException {
         for (Persistable service : services) {
-            service.save();
+            if (InvoiceServiceImpl.class.isAssignableFrom(service.getClass())) service.save();
+//            service.save();
         }
     }
 }

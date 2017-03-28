@@ -33,7 +33,8 @@ public abstract class GenericDAOImpl<T> implements GenericDAO<T> {
     public T get(String id) {
         try {
             Session session = sessionFactory.getCurrentSession();
-            return session.load(entityClass, id);
+            T ob = session.load(entityClass, id);
+            return ob;
         } catch (Exception e) {
             logger.error("Exception occured when application got entity by id", e);
             throw e;

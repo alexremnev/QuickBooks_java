@@ -10,7 +10,7 @@ import java.util.List;
  *
  * @param <T> the type of persistable entity.
  */
-public interface Persistable<T extends SalesTransaction> extends Calculative {
+public interface Persistable<T extends SalesTransaction> extends Calculable {
     /**
      * Saves list of {@code com.intuit.ipp.data.SalesTransaction}'s entities.
      *

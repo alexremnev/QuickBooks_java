@@ -27,12 +27,20 @@ public class SalesReceiptServiceImpl extends BaseServiceImpl<SalesReceipt> imple
     }
 
     private void deleteDepositedSalesReceipts(List<SalesTransaction> recalculateEntity) throws FMSException {
-        if (recalculateEntity == null) recalculateEntity = oauthService.getDataService().findAll(new SalesReceipt());
-        List<Deposit> deposits = oauthService.getDataService().findAll(new Deposit());
+        if (recalculateEntity == null) recalculateEntity = getAllSalesReceipts();
+        List<Deposit> deposits = getAllDeposits();
         for (SalesTransaction salesReceipt : recalculateEntity) {
             Deposit deposit = findDeposit(deposits, salesReceipt);
             if (deposit != null) oauthService.getDataService().delete(deposit);
         }
+    }
+
+    private List<Deposit> getAllDeposits() throws FMSException {
+        return oauthService.getDataService().findAll(new Deposit());
+    }
+
+    private List<SalesTransaction> getAllSalesReceipts() throws FMSException {
+        return oauthService.getDataService().findAll(new SalesReceipt());
     }
 
     private static Deposit findDeposit(List<Deposit> deposits, IntuitEntity salesReceipt) {

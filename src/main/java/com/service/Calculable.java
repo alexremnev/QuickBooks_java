@@ -5,7 +5,7 @@ import com.intuit.ipp.data.Entity;
 /**
  * Represent operations for calculating sales tax in {@code com.intuit.ipp.data.SalesTransaction}'s entities.
  */
-public interface Calculative {
+public interface Calculable {
     /**
      * Recalculates sales tax in all entities.
      */

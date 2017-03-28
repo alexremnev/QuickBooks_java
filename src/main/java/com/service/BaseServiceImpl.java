@@ -13,7 +13,7 @@ import com.model.Report;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.*;
+import org.springframework.stereotype.Service;
 
 import java.lang.Class;
 import java.lang.reflect.ParameterizedType;
@@ -110,10 +110,10 @@ public abstract class BaseServiceImpl<T extends SalesTransaction> implements Bas
                 if (!entity.getOperation().equals("Update")) return;
                 Report reportEntity = reportDAO.get(entity.getId());
                 if (reportEntity == null) {
-                    calculate(entityFromQuickBooks);
+                    save(calculate(entityFromQuickBooks));
                     return;
                 }
-                if (isEqualLines(entityFromQuickBooks.get(0).getLine(), reportEntity.getLineItems())) return;
+                if (isEqualLines(entityFromQuickBooks.get(0), reportEntity.getLineItems())) return;
                 List<SalesTransaction> recalculatedList = calculate(entityFromQuickBooks);
                 reportDAO.delete(entity.getId());
                 save(recalculatedList);
@@ -155,8 +155,7 @@ public abstract class BaseServiceImpl<T extends SalesTransaction> implements Bas
         StringBuilder address = getAddress(entity);
         report.setShipToAddress(address.toString());
         if (entity.getLine() == null) {
-            reportDAO.save(report);
-            return null;
+            return report;
         }
         List<LineItem> lineItemList = getLineItems(entity);
         report.setLineItems(lineItemList);
@@ -166,17 +165,24 @@ public abstract class BaseServiceImpl<T extends SalesTransaction> implements Bas
     private List<LineItem> getLineItems(SalesTransaction entity) {
         List<LineItem> lineItemList = new ArrayList<>();
         for (Line line : entity.getLine()) {
-            LineItem lineItem = new LineItem();
             if (line == null) continue;
+            if (!line.getDetailType().equals(LineDetailTypeEnum.SALES_ITEM_LINE_DETAIL)) continue;
+            LineItem lineItem = new LineItem();
             lineItem.setAmount(line.getAmount());
             if (line.getSalesItemLineDetail() != null) {
                 lineItem.setQuantity(line.getSalesItemLineDetail().getQty());
                 if ((line.getSalesItemLineDetail().getItemRef() != null) && (line.getSalesItemLineDetail().getItemRef().getName() != null))
                     lineItem.setName(line.getSalesItemLineDetail().getItemRef().getName());
             }
+            lineItem.setHash(getHash(entity, line, lineItem));
             lineItemList.add(lineItem);
         }
         return lineItemList;
+    }
+
+    private int getHash(SalesTransaction entity, Line line, LineItem lineItem) {
+        return lineItem.hashCode() +
+                ((entity.getTxnTaxDetail().getTxnTaxCodeRef()) == null ? 0 : entity.getTxnTaxDetail().getTxnTaxCodeRef().getValue().hashCode()) +line.getSalesItemLineDetail().getTaxCodeRef().getValue().hashCode()+entity.getTxnTaxDetail().getTotalTax().hashCode();
     }
 
     private StringBuilder getAddress(SalesTransaction entity) {
@@ -309,9 +315,10 @@ public abstract class BaseServiceImpl<T extends SalesTransaction> implements Bas
 
     private TaxAgency getTaxAgency(DataService service) throws FMSException {
         TaxAgency taxAgency = new TaxAgency();
-        TaxAgency taxagency = GenerateQuery.createQueryEntity(TaxAgency.class);
-        String query = select($(taxagency)).generate();
-        query = query.replaceAll("tring.", "");
+//        TaxAgency taxagency = GenerateQuery.createQueryEntity(TaxAgency.class);
+//        String query = select($(taxagency)).generate();
+//        query = query.replaceAll("tring.", "");
+        String query = "Select * From TaxAgency";
         QueryResult queryResult = service.executeQuery(query);
         if (queryResult != null) taxAgency = (TaxAgency) queryResult.getEntities().get(0);
         return taxAgency;
@@ -320,6 +327,7 @@ public abstract class BaseServiceImpl<T extends SalesTransaction> implements Bas
     private String getTaxRateId(BigDecimal taxRate) throws FMSException {
         List<com.intuit.ipp.data.TaxRate> taxRates = getDataService().findAll(new com.intuit.ipp.data.TaxRate());
         for (com.intuit.ipp.data.TaxRate rateValue : taxRates) {
+            if ((rateValue == null) || (rateValue.getRateValue() == null)) continue;
             if ((rateValue.getRateValue().compareTo(taxRate) == 0) && (rateValue.isActive())) {
                 return rateValue.getId();
             }
@@ -346,11 +354,16 @@ public abstract class BaseServiceImpl<T extends SalesTransaction> implements Bas
         return (List<SalesTransaction>) result.getEntities();
     }
 
-    private static Boolean isEqualLines(List<Line> quickBookslines, List<LineItem> actualLines) {
-        if (quickBookslines.size() - actualLines.size() != 0) return false;
-        for (int i = 0; i < quickBookslines.size(); i++) {
-            if (quickBookslines.get(i).getDetailType() == LineDetailTypeEnum.SUB_TOTAL_LINE_DETAIL) return false;
-            if (quickBookslines.get(i).getAmount().compareTo(actualLines.get(i).getAmount()) == 0) return false;
+    private Boolean isEqualLines(SalesTransaction quickBooksEntity, List<LineItem> actualLines) {
+        if (quickBooksEntity.getLine().stream().filter(line -> line.getDetailType() == LineDetailTypeEnum.SALES_ITEM_LINE_DETAIL).count() -
+                actualLines.size() != 0) return false;
+
+        List<LineItem> lineItems = getLineItems(quickBooksEntity);
+        for (int i = 0; i < lineItems.size(); i++) {
+            int finalI = i;
+            if (actualLines.stream().noneMatch(lineItem -> lineItem.getHash() == lineItems.get(finalI).getHash())) {
+                return false;
+            }
         }
         return true;
     }
